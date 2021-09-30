@@ -48,7 +48,6 @@ public sealed class EntityCell extends Cell permits StopCell {
         this(position);
         if(initialEntity != null)
             initialEntity.setOwner(this);
-        //this.setEntity(initialEntity);
         this.entity = initialEntity;
     }
 
@@ -79,12 +78,13 @@ public sealed class EntityCell extends Cell permits StopCell {
         var previous_entity = this.entity;
         if(this.entity != null){
             this.entity.setOwner(null);
-            this.entity = newEntity;
-            if(newEntity != null){
-                this.entity.setOwner(this);
-            }
+        }
+        this.entity = newEntity;
+        if(newEntity != null){
+            this.entity.setOwner(this);
         }
         return previous_entity;
+
     }
 
     /**

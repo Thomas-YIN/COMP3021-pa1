@@ -49,13 +49,16 @@ public final class GameBoard {
      */
     public GameBoard(final int numRows, final int numCols, @NotNull final Cell[][] cells) {
         // TODO
+        //Incompatibility of game board size
+        if(numRows != cells.length || numCols != cells[0].length){
+            throw new IllegalArgumentException("Game board size does not match!");
+        }
         //Inspect the passed-in cells
         int num_players = 0;
         int num_gems = 0;
         Player target = null;
         for(int r=0; r<numRows; r++){
             for(int c=0; c<numCols; c++){
-                //EntityCell toEntityCell = (EntityCell) cells[r][c];
                 if(cells[r][c] instanceof EntityCell toEntityCell){
                     if(toEntityCell.getEntity() instanceof Player) {
                         num_players++;
@@ -66,91 +69,85 @@ public final class GameBoard {
                 }
             }
         }
-        //Incompatibility of game board size
-        if(numRows != cells.length || numCols != cells[0].length){
-            throw new IllegalArgumentException("Game board size does not match!");
-        }
+
         //Invalid number of players
-        else if(num_players != 1){
-            throw new IllegalArgumentException("Invalid number of players!");
+        if(num_players != 1){
+            throw new IllegalArgumentException("Invalid number of players! Number of players: " + num_players);
         }
         //Invalid initialization of gems
         else if(num_gems == 0){
             throw new IllegalArgumentException("There are no gems in the game board!");
         }
-        //TODO: Unreachable gems exist(flood fill algorithm)
 
-        //Assign values to the GameBoard
+        //Assign values to the game board properties
         this.numRows = numRows;
         this.numCols = numCols;
         this.board = cells;
         this.player = target;
-        //Prepare for FF
-        char[][] paint = paint(cells);
-        floodfill(paint, this.player.getOwner().getPosition().row(), this.player.getOwner().getPosition().col(), 'P');
+
+        //Prepare for flood fill algorithm
+        char[][] label = label(cells);
+
+        if(this.player.getOwner() != null)
+            floodfill(label, this.player.getOwner().getPosition().row(), this.player.getOwner().getPosition().col(), 'P');
+
+        int reachable = num_reachable_gems(label, cells);
+        if(reachable != num_gems){
+            throw new IllegalArgumentException("There are unreachable gems in the board! Reachable: " + reachable + " Total: " + num_gems);
+        }
+
+    }
+
+    //count number of reachable gems
+    int num_reachable_gems(char[][] label, Cell[][] cells){
         int reachable=0;
         for(int r=0; r<this.numRows; r++){
             for(int c=0; c<this.numCols; c++){
-                if(paint[r][c] == 'P' && ((EntityCell) cells[r][c]).getEntity() instanceof Gem){
+                if(label[r][c] == 'P' && ((EntityCell) cells[r][c]).getEntity() instanceof Gem){
                     reachable++;
                 }
             }
         }
-        if(reachable != num_gems){
-            throw new IllegalArgumentException("There are unreachable gems in the board!");
-        }
-
+        return reachable;
     }
 
     //Label the cells with a "color"
-    private char[][] paint(Cell[][] cells){
-        char[][] painted = new char[numRows][numCols];
+    private char[][] label(Cell[][] cells){
+        //character version of the game board
+        char[][] labeled_board = new char[numRows][numCols];
+
         for(int r=0; r<numRows; r++){
             for(int c=0; c<numCols; c++){
                 if(cells[r][c] instanceof Wall){
-                    painted[r][c] = 'W';
-                }else if(((EntityCell) cells[r][c]).getEntity() instanceof Player){
-                    painted[r][c] = 'P';
+                    labeled_board[r][c] = 'W'; //Wall cells
                 }else{
-                    painted[r][c] = 'O';
+                    labeled_board[r][c] = 'O'; //Other cells
                 }
-
             }
         }
-        return painted;
+        return labeled_board;
     }
 
-    private boolean isSafe(char[][] mat, int x, int y, char target){
-        return x >= 0 && x < mat.length && y >= 0 && y < mat[0].length && mat[x][y] == target;
-    }
+    private void floodfill(char[][] cells, int rowCoor, int colCoor, char newLabel){
 
-    private void floodfill(char[][] mat, int x, int y, char replacement) {
-
-        final int[] row = {-1, 0, 0, 1};
-        final int[] col = {0, -1, 1, 0};
-        // base case
-        if (mat == null || mat.length == 0) {
+        //4 possible move directions
+        int[] row = {-1, 0, 0, 1};
+        int[] col = {0, -1, 1, 0};
+        char target = cells[rowCoor][colCoor];
+        //Terminate
+        if (target == newLabel) {
             return;
         }
-
-        // get the target color
-        char target = mat[x][y];
-
-        // target color is same as replacement
-        if (target == replacement) {
-            return;
-        }
-
-        // replace the current pixel color with that of replacement
-        mat[x][y] = replacement;
-
-        // process all eight adjacent pixels of the current pixel and
-        // recur for each valid pixel
-        for (int k = 0; k < 4; k++) {
-            // if the adjacent pixel at position (x + row[k], y + col[k]) is
-            // a valid pixel and has the same color as that of the current pixel
-            if (isSafe(mat, x + row[k], y + col[k], target)) {
-                floodfill(mat, x + row[k], y + col[k], replacement);
+        cells[rowCoor][colCoor] = newLabel;
+        //try to move in each direction
+        for (int i=0; i<4; i++) {
+            int newRow = rowCoor+row[i];
+            int newCol = colCoor+col[i];
+            //if the next cell is still reachable
+            if (newRow >= 0 && newRow < cells.length
+                && newCol >= 0 && newCol < cells[0].length
+                && cells[newRow][newCol] == target){
+                floodfill(cells, rowCoor+row[i], colCoor+col[i], newLabel);
             }
         }
     }
@@ -226,10 +223,8 @@ public final class GameBoard {
     public EntityCell getEntityCell(final int r, final int c) {
         // TODO done(Q: What would be the value of entity once a Cell obj is converted to EntityCell obj?)
         Cell asCell = this.board[r][c];
-        EntityCell asEntityCell = (EntityCell) asCell;
-        if(asEntityCell.entity == null){
+        if(!(asCell instanceof EntityCell asEntityCell))
             throw new IllegalArgumentException("The given position is not an instance of EntityCell!");
-        }
         return asEntityCell;
     }
 
@@ -289,7 +284,7 @@ public final class GameBoard {
         for(int i=0; i<numRows; i++){
             for(int j=0; j<numCols; j++){
                 EntityCell current = (EntityCell) this.board[i][j];
-                if(current.getEntity() != null && current.getEntity().getClass() == Gem.class){
+                if(current.getEntity() instanceof Gem){
                     numOfGems++;
                 }
             }
