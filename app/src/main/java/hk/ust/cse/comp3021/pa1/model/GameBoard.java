@@ -48,7 +48,7 @@ public final class GameBoard {
      *                                  </ul>
      */
     public GameBoard(final int numRows, final int numCols, @NotNull final Cell[][] cells) {
-        // TODO
+        // TODO done
         //Incompatibility of game board size
         if(numRows != cells.length || numCols != cells[0].length){
             throw new IllegalArgumentException("Game board size does not match!");
@@ -64,7 +64,6 @@ public final class GameBoard {
                         num_players++;
                         target = (Player) toEntityCell.getEntity();
                     }
-
                     if(toEntityCell.getEntity() instanceof Gem) num_gems++;
                 }
             }
@@ -92,6 +91,7 @@ public final class GameBoard {
             floodfill(label, this.player.getOwner().getPosition().row(), this.player.getOwner().getPosition().col(), 'P');
 
         int reachable = num_reachable_gems(label, cells);
+        //There are unreachable gems on the game board
         if(reachable != num_gems){
             throw new IllegalArgumentException("There are unreachable gems in the board! Reachable: " + reachable + " Total: " + num_gems);
         }
@@ -281,11 +281,13 @@ public final class GameBoard {
     public int getNumGems() {
         // TODO done
         int numOfGems = 0;
-        for(int i=0; i<numRows; i++){
-            for(int j=0; j<numCols; j++){
-                EntityCell current = (EntityCell) this.board[i][j];
-                if(current.getEntity() instanceof Gem){
-                    numOfGems++;
+
+        for(int r=0; r<numRows; r++){
+            for(int c=0; c<numCols; c++){
+                if(this.board[r][c] instanceof EntityCell current){
+                    if(current.getEntity() instanceof Gem){
+                        numOfGems++;
+                    }
                 }
             }
         }

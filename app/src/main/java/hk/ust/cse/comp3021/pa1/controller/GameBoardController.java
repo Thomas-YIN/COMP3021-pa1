@@ -60,7 +60,7 @@ public class GameBoardController {
         //Valid cases
         List<Position> gems = new ArrayList<>();
         List<Position> extralives = new ArrayList<>();
-        Entity entityOnNewPos; //Stores the entity on the new cell
+        @Nullable Entity entityOnNewPos = null; //Stores the entity on the new cell
         Position adjPos = OrigPos; //Keeps track of the last cell position
 
         while(true){
@@ -68,7 +68,9 @@ public class GameBoardController {
             if(newPos == null){
                 return new MoveResult.Valid.Alive(OrigPos, adjPos, gems, extralives);
             }else {
-                entityOnNewPos = ((EntityCell) this.gameBoard.getCell(newPos)).getEntity();
+                if(this.gameBoard.getCell(newPos) instanceof EntityCell newEntityCell){
+                    entityOnNewPos = newEntityCell.getEntity();
+                }
                 //Termination#2: The new cell contains a mine --> valid dead move
                 if (entityOnNewPos instanceof Mine) {
                     return new MoveResult.Valid.Dead(adjPos, newPos);

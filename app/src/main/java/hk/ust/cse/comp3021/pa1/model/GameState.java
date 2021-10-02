@@ -122,7 +122,11 @@ public class GameState {
         // TODO done
         if(this.numLives == UNLIMITED_LIVES){
             return Integer.MAX_VALUE;
-        }else return (this.numLives+delta);
+        }else{
+            this.numLives += delta;
+            return this.numLives;
+        }
+
     }
 
     /**
@@ -136,7 +140,11 @@ public class GameState {
         // TODO done
         if(this.numLives == UNLIMITED_LIVES){
             return Integer.MAX_VALUE;
-        }else return (this.numLives-delta);
+        }else{
+            this.numLives -= delta;
+            return this.numLives;
+        }
+
     }
 
     /**
@@ -149,7 +157,10 @@ public class GameState {
         // TODO done
         if(this.numLives == UNLIMITED_LIVES){
             return Integer.MAX_VALUE;
-        }else return (this.numLives-1);
+        }else{
+            this.numLives--;
+            return this.numLives;
+        }
     }
 
     /**
