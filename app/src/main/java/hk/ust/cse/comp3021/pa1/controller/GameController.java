@@ -35,63 +35,19 @@ public class GameController {
      * @return An instance of {@link MoveResult} indicating the result of the action.
      */
     public MoveResult processMove(@NotNull final Direction direction) {
-        // TODO Q: Same implementation by copying code??
-        if(this.gameState.getGameBoard().getPlayer().getOwner() == null){
-            throw new IllegalArgumentException("The player seems not on the game board!");
+        // TODO
+        MoveResult result = this.gameState.getGameBoardController().makeMove(direction);
+        if(result instanceof MoveResult.Valid.Dead){
+            this.gameState.incrementNumMoves();
+            this.gameState.decrementNumLives();
+            this.gameState.incrementNumDeaths();
+            //this.gameState.getMoveStack().push(result);
+        }else if(result instanceof MoveResult.Valid.Alive){
+            this.gameState.incrementNumMoves();
+            this.gameState.increaseNumLives(((MoveResult.Valid.Alive) result).collectedExtraLives.size());
+            this.gameState.getMoveStack().push(result);
         }
-        final Position OrigPos = this.gameState.getGameBoard().getPlayer().getOwner().getPosition();
-        //The immediate new position of the move.
-        Position newPos = OrigPos.offsetByOrNull(direction.getOffset(),
-                this.gameState.getGameBoard().getNumRows(),
-                this.gameState.getGameBoard().getNumCols());
-        //Invalid cases
-        if(newPos == null || this.gameState.getGameBoard().getCell(newPos) instanceof Wall){
-            return new MoveResult.Invalid(OrigPos);
-        }
-        //Valid cases
-        List<Position> gems = new ArrayList<>();
-        List<Position> extralives = new ArrayList<>();
-        Entity entityOnNewPos; //Stores the entity on the new cell
-        Position adjPos = OrigPos; //Keeps track of the last cell position
-        this.gameState.incrementNumMoves();
-        while(true){
-            //Termination#1: The new cell is out of bounds
-            if(newPos == null){
-
-                return new MoveResult.Valid.Alive(OrigPos, adjPos, gems, extralives);
-            }else {
-                entityOnNewPos = ((EntityCell) this.gameState.getGameBoard().getCell(newPos)).getEntity();
-                //Termination#2: The new cell contains a mine --> valid dead move
-                if (entityOnNewPos instanceof Mine) {
-                    return new MoveResult.Valid.Dead(adjPos, newPos);
-                }
-                //Termination#3: The new cell is a Wall
-                else if (this.gameState.getGameBoard().getCell(newPos) instanceof Wall) {
-                    return new MoveResult.Valid.Alive(OrigPos, adjPos, gems, extralives);
-                }
-                //Termination#4: The new cell is a stop cell
-                else if (this.gameState.getGameBoard().getCell(newPos) instanceof StopCell) {
-                    return new MoveResult.Valid.Alive(OrigPos, newPos, gems, extralives);
-                }
-                //not terminate yet
-                else {
-                    //picks up gems
-                    if (entityOnNewPos instanceof Gem) {
-                        gems.add(newPos);
-                    }
-                    //picks up extra lives
-                    else if (entityOnNewPos instanceof ExtraLife) {
-                        extralives.add(newPos);
-                    }
-                    //empty cell (nothing to do)
-                }
-                //Update newPos and adjPos to check the next cell
-                this.gameState.incrementNumMoves();
-                adjPos = newPos;
-                newPos = newPos.offsetByOrNull(direction.getOffset(), this.gameState.getGameBoard().getNumRows(), this.gameState.getGameBoard().getNumCols());
-            }
-        }
-        //return null;
+        return result;
     }
 
     /**
@@ -101,6 +57,15 @@ public class GameController {
      */
     public boolean processUndo() {
         // TODO
-        return false;
+        if(this.gameState.getMoveStack().isEmpty())
+            return false;
+        else{
+            //Note that prev can only be a Valid Alive move,
+            //because everything pushed in the MoveStack is instance of MoveResult.Valid.Alive
+            MoveResult prev = this.gameState.getMoveStack().pop();
+            this.gameState.getGameBoardController().undoMove(prev);
+            this.gameState.decreaseNumLives(((MoveResult.Valid.Alive) prev).collectedExtraLives.size());
+            return true;
+        }
     }
 }

@@ -310,7 +310,7 @@ public class GameBoardControllerTest {
                 return new EntityCell(pos, new Player());
             } else if (pos.equals(new Position(0, 2))) {
                 return new EntityCell(pos, new Mine());
-            } else if (pos.equals(new Position(1, 2))) {
+            } else if (pos.equals(new Position(0, 1))) {
                 return new EntityCell(pos, new Gem());
             } else {
                 return new EntityCell(pos);
@@ -321,7 +321,7 @@ public class GameBoardControllerTest {
         assumeTrue(gameBoard.getEntityCell(0, 0).getEntity() instanceof Player);
         assumeTrue(gameBoard.getPlayer().equals(gameBoard.getEntityCell(0, 0).getEntity()));
         assumeTrue(gameBoard.getNumGems() == 1);
-        assumeTrue(gameBoard.getEntityCell(1, 2).getEntity() instanceof Gem);
+        assumeTrue(gameBoard.getEntityCell(0, 1).getEntity() instanceof Gem);
         assumeTrue(gameBoard.getEntityCell(0, 2).getEntity() instanceof Mine);
 
         final var moveResult = controller.makeMove(Direction.RIGHT);
@@ -338,7 +338,7 @@ public class GameBoardControllerTest {
         assertEquals(gameBoard.getPlayer(), gameBoard.getEntityCell(0, 0).getEntity());
         assertTrue(gameBoard.getEntityCell(0, 2).getEntity() instanceof Mine);
         assertEquals(1, gameBoard.getNumGems());
-        assertTrue(gameBoard.getEntityCell(1, 2).getEntity() instanceof Gem);
+        assertTrue(gameBoard.getEntityCell(0, 1).getEntity() instanceof Gem);
     }
 
     // Undoes the following move:

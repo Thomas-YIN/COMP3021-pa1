@@ -45,12 +45,10 @@ public final class StopCell extends EntityCell {
             var previous_entity = this.entity;
             if(this.entity != null){
                 this.entity.setOwner(null);
-                if(newEntity != null){
-                    if(newEntity.getOwner() != null)
-                        newEntity.getOwner().entity = null;
-                    this.entity = newEntity;
-                    this.entity.setOwner(this);
-                }
+            }
+            this.entity = newEntity;
+            if(newEntity != null){
+                this.entity.setOwner(this);
             }
             return previous_entity;
         }
