@@ -245,12 +245,12 @@ public class GameState {
     public int getScore() {
         // TODO done
         //The initial score equals the game board size
-        int current_score = this.gameBoard.getNumCols() * this.gameBoard.getNumRows();
+        int currentScore = this.gameBoard.getNumCols() * this.gameBoard.getNumRows();
         int numGemCollected = this.initialNumOfGems - this.getNumGems();
         int numUndo = this.moveStack.getPopCount();
         //Score calculation
-        current_score = current_score + 10*numGemCollected - this.numMoves - 2*numUndo - 4*this.numDeaths;
-        return current_score;
+        currentScore = currentScore + 10*numGemCollected - this.numMoves - 2*numUndo - 4*this.numDeaths;
+        return currentScore;
     }
 
     /**

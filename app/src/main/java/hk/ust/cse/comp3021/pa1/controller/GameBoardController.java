@@ -48,28 +48,28 @@ public class GameBoardController {
         if(this.gameBoard.getPlayer().getOwner() == null){
             throw new IllegalArgumentException("The player seems not on the game board!");
         }
-        final Position OrigPos = this.gameBoard.getPlayer().getOwner().getPosition();
+        final Position origPos = this.gameBoard.getPlayer().getOwner().getPosition();
         //The immediate new position of the move.
-        Position newPos = OrigPos.offsetByOrNull(direction.getOffset(),
+        Position newPos = origPos.offsetByOrNull(direction.getOffset(),
                                                  this.gameBoard.getNumRows(),
                                                  this.gameBoard.getNumCols());
         //Invalid cases
         if(newPos == null || this.gameBoard.getCell(newPos) instanceof Wall){
-            return new MoveResult.Invalid(OrigPos);
+            return new MoveResult.Invalid(origPos);
         }
         //Valid cases
         List<Position> gems = new ArrayList<>();
         List<Position> extralives = new ArrayList<>();
         @Nullable Entity entityOnNewPos = null; //Stores the entity on the new cell
-        Position adjPos = OrigPos; //Keeps track of the last cell position
+        Position adjPos = origPos; //Keeps track of the last cell position
 
         while(true){
             //Termination#1: The new cell is out of bounds
             if(newPos == null){
                 //Move the player on the board
-                ((EntityCell) this.gameBoard.getCell(OrigPos)).setEntity(null);
+                ((EntityCell) this.gameBoard.getCell(origPos)).setEntity(null);
                 ((EntityCell) this.gameBoard.getCell(adjPos)).setEntity(this.gameBoard.getPlayer());
-                return new MoveResult.Valid.Alive(adjPos, OrigPos, gems, extralives);
+                return new MoveResult.Valid.Alive(adjPos, origPos, gems, extralives);
             }else {
                 if(this.gameBoard.getCell(newPos) instanceof EntityCell newEntityCell){
                     entityOnNewPos = newEntityCell.getEntity();
@@ -77,37 +77,34 @@ public class GameBoardController {
                 //Termination#2: The new cell contains a mine --> valid dead move
                 if (entityOnNewPos instanceof Mine) {
                     //give back all the collected items(gems, extralives)
-                    for(Position p_gem : gems){
-                        ((EntityCell) this.gameBoard.getCell(p_gem)).setEntity(new Gem());
+                    for(Position pGem : gems){
+                        ((EntityCell) this.gameBoard.getCell(pGem)).setEntity(new Gem());
                     }
-                    for(Position p_extralives : extralives){
-                        ((EntityCell) this.gameBoard.getCell(p_extralives)).setEntity(new ExtraLife());
+                    for(Position pExtralives : extralives){
+                        ((EntityCell) this.gameBoard.getCell(pExtralives)).setEntity(new ExtraLife());
                     }
-                    return new MoveResult.Valid.Dead(OrigPos, newPos);
-                }
-                //Termination#3: The new cell is a Wall
-                else if (this.gameBoard.getCell(newPos) instanceof Wall) {
-                    ((EntityCell) this.gameBoard.getCell(OrigPos)).setEntity(null);
+                    return new MoveResult.Valid.Dead(origPos, newPos);
+                }else if (this.gameBoard.getCell(newPos) instanceof Wall) {
+                    //Termination#3: The new cell is a Wall
+                    ((EntityCell) this.gameBoard.getCell(origPos)).setEntity(null);
                     ((EntityCell) this.gameBoard.getCell(adjPos)).setEntity(this.gameBoard.getPlayer());
-                    return new MoveResult.Valid.Alive(adjPos, OrigPos, gems, extralives);
-                }
-                //Termination#4: The new cell is a stop cell
-                else if (this.gameBoard.getCell(newPos) instanceof StopCell) {
-                    ((EntityCell) this.gameBoard.getCell(OrigPos)).setEntity(null);
+                    return new MoveResult.Valid.Alive(adjPos, origPos, gems, extralives);
+                }else if (this.gameBoard.getCell(newPos) instanceof StopCell) {
+                    //Termination#4: The new cell is a stop cell
+                    ((EntityCell) this.gameBoard.getCell(origPos)).setEntity(null);
                     //((EntityCell) this.gameBoard.getCell(newPos)).setEntity(this.gameBoard.getPlayer());
                     ((StopCell) this.gameBoard.getCell(newPos)).setPlayer(this.gameBoard.getPlayer());
-                    return new MoveResult.Valid.Alive(newPos, OrigPos, gems, extralives);
-                }
+                    return new MoveResult.Valid.Alive(newPos, origPos, gems, extralives);
+                }else{
                 //not terminate yet
-                else {
                     //picks up gems
                     if (entityOnNewPos instanceof Gem) {
                         //Remove the gem in the cell
                         ((EntityCell) this.gameBoard.getCell(newPos)).setEntity(null);
                         gems.add(newPos);
-                    }
+                    }else if (entityOnNewPos instanceof ExtraLife) {
                     //picks up extra lives
-                    else if (entityOnNewPos instanceof ExtraLife) {
+                        //Remove the extra life in the cell
                         ((EntityCell) this.gameBoard.getCell(newPos)).setEntity(null);
                         extralives.add(newPos);
                     }
@@ -139,11 +136,11 @@ public class GameBoardController {
             ((EntityCell) this.gameBoard.getCell(newPos)).setEntity(null);
             ((EntityCell) this.gameBoard.getCell(OrigPos)).setEntity(this.gameBoard.getPlayer());
             //restore the picked up items
-            for(Position p_gem : ((MoveResult.Valid.Alive) prevMove).collectedGems){
-                ((EntityCell) this.gameBoard.getCell(p_gem)).setEntity(new Gem());
+            for(Position pGem : ((MoveResult.Valid.Alive) prevMove).collectedGems){
+                ((EntityCell) this.gameBoard.getCell(pGem)).setEntity(new Gem());
             }
-            for(Position p_extralives : ((MoveResult.Valid.Alive) prevMove).collectedExtraLives){
-                ((EntityCell) this.gameBoard.getCell(p_extralives)).setEntity(new ExtraLife());
+            for(Position pExtralives : ((MoveResult.Valid.Alive) prevMove).collectedExtraLives){
+                ((EntityCell) this.gameBoard.getCell(pExtralives)).setEntity(new ExtraLife());
             }
         }
     }

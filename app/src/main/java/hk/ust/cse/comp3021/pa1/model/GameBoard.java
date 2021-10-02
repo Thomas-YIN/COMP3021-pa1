@@ -54,27 +54,26 @@ public final class GameBoard {
             throw new IllegalArgumentException("Game board size does not match!");
         }
         //Inspect the passed-in cells
-        int num_players = 0;
-        int num_gems = 0;
+        int numPlayers = 0;
+        int numGems = 0;
         Player target = null;
         for(int r=0; r<numRows; r++){
             for(int c=0; c<numCols; c++){
                 if(cells[r][c] instanceof EntityCell toEntityCell){
                     if(toEntityCell.getEntity() instanceof Player) {
-                        num_players++;
+                        numPlayers++;
                         target = (Player) toEntityCell.getEntity();
                     }
-                    if(toEntityCell.getEntity() instanceof Gem) num_gems++;
+                    if(toEntityCell.getEntity() instanceof Gem) numGems++;
                 }
             }
         }
 
         //Invalid number of players
-        if(num_players != 1){
-            throw new IllegalArgumentException("Invalid number of players! Number of players: " + num_players);
-        }
+        if(numPlayers != 1){
+            throw new IllegalArgumentException("Invalid number of players! Number of players: " + numPlayers);
+        }else if(numGems == 0){
         //Invalid initialization of gems
-        else if(num_gems == 0){
             throw new IllegalArgumentException("There are no gems in the game board!");
         }
 
@@ -87,19 +86,21 @@ public final class GameBoard {
         //Prepare for flood fill algorithm
         char[][] label = label(cells);
 
-        if(this.player.getOwner() != null)
-            floodfill(label, this.player.getOwner().getPosition().row(), this.player.getOwner().getPosition().col(), 'P');
-
-        int reachable = num_reachable_gems(label, cells);
+        if(this.player.getOwner() != null) floodfill(label,
+                                                     this.player.getOwner().getPosition().row(),
+                                                     this.player.getOwner().getPosition().col(),
+                                                     'P');
+        //Count the number of reachable gems
+        int reachable = numReachableGems(label, cells);
         //There are unreachable gems on the game board
-        if(reachable != num_gems){
-            throw new IllegalArgumentException("There are unreachable gems in the board! Reachable: " + reachable + " Total: " + num_gems);
+        if(reachable != numGems){
+            throw new IllegalArgumentException("There are unreachable gems in the board! Reachable: " + reachable + " Total: " + numGems);
         }
 
     }
 
     //count number of reachable gems
-    int num_reachable_gems(char[][] label, Cell[][] cells){
+    int numReachableGems(char[][] label, Cell[][] cells){
         int reachable=0;
         for(int r=0; r<this.numRows; r++){
             for(int c=0; c<this.numCols; c++){
@@ -114,18 +115,18 @@ public final class GameBoard {
     //Label the cells with a "color"
     private char[][] label(Cell[][] cells){
         //character version of the game board
-        char[][] labeled_board = new char[numRows][numCols];
+        char[][] labeledBoard = new char[numRows][numCols];
 
         for(int r=0; r<numRows; r++){
             for(int c=0; c<numCols; c++){
                 if(cells[r][c] instanceof Wall){
-                    labeled_board[r][c] = 'W'; //Wall cells
+                    labeledBoard[r][c] = 'W'; //Wall cells
                 }else{
-                    labeled_board[r][c] = 'O'; //Other cells
+                    labeledBoard[r][c] = 'O'; //Other cells
                 }
             }
         }
-        return labeled_board;
+        return labeledBoard;
     }
 
     private void floodfill(char[][] cells, int rowCoor, int colCoor, char newLabel){

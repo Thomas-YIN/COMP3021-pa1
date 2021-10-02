@@ -44,10 +44,10 @@ public abstract sealed class Entity implements BoardElement permits ExtraLife, G
     @Nullable
     public final EntityCell setOwner(@Nullable final EntityCell owner) {
         // TODO
-        var previous_owner = this.owner;
-        if(previous_owner != null) previous_owner.entity = null;
+        var previousOwner = this.owner;
+        if(previousOwner != null) previousOwner.entity = null;
         this.owner = owner;
-        return previous_owner;
+        return previousOwner;
     }
 
     /**

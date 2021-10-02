@@ -75,7 +75,7 @@ public sealed class EntityCell extends Cell permits StopCell {
     @Nullable
     public Entity setEntity(@Nullable final Entity newEntity) {
         // TODO
-        var previous_entity = this.entity;
+        var previousEntity = this.entity;
         if(this.entity != null){
             this.entity.setOwner(null);
         }
@@ -83,7 +83,7 @@ public sealed class EntityCell extends Cell permits StopCell {
         if(newEntity != null){
             this.entity.setOwner(this);
         }
-        return previous_entity;
+        return previousEntity;
 
     }
 

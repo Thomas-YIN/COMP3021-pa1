@@ -42,7 +42,7 @@ public final class StopCell extends EntityCell {
         if(newEntity != null && !(newEntity instanceof Player)){
             throw new IllegalArgumentException();
         }else{
-            var previous_entity = this.entity;
+            var previousEntity = this.entity;
             if(this.entity != null){
                 this.entity.setOwner(null);
             }
@@ -50,7 +50,7 @@ public final class StopCell extends EntityCell {
             if(newEntity != null){
                 this.entity.setOwner(this);
             }
-            return previous_entity;
+            return previousEntity;
         }
     }
 

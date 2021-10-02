@@ -34,13 +34,10 @@ public class MoveStack {
         //First handle the valid alive moves
         if(move instanceof MoveResult.Valid.Alive){
             moves.add(move);
-        }
+        }else if(move instanceof MoveResult.Invalid){
         //TODO: Handle other type of moves by throwing exceptions?
-        else if(move instanceof MoveResult.Invalid){
             throw new IllegalArgumentException("Invalid move!");
-        }
-        else if(move instanceof MoveResult.Valid.Dead){
-            //moves.add(move);
+        }else if(move instanceof MoveResult.Valid.Dead){
             throw new IllegalArgumentException("You died!");
         }
     }
