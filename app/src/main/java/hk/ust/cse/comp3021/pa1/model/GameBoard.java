@@ -100,7 +100,7 @@ public final class GameBoard {
     }
 
     //count number of reachable gems
-    int numReachableGems(char[][] label, Cell[][] cells){
+    private int numReachableGems(char[][] label, Cell[][] cells){
         int reachable=0;
         for(int r=0; r<this.numRows; r++){
             for(int c=0; c<this.numCols; c++){

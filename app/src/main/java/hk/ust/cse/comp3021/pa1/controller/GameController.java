@@ -3,8 +3,6 @@ package hk.ust.cse.comp3021.pa1.controller;
 import hk.ust.cse.comp3021.pa1.model.*;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Controller for {@link hk.ust.cse.comp3021.pa1.InertiaTextGame}.
