@@ -18,10 +18,6 @@ questions before asking your TAs.*
 - [Java Concepts](#java-concepts)
 - [Tasks](#tasks)
 - [IntelliJ Run Configurations](#intellij-run-configurations)
-- [Submission](#submission)
-- [Grading Scheme](#grading-scheme)
-- [FAQ](#faq)
-- [Want To Know More?](#want-to-know-more)
 
 ## Game Elements
 
